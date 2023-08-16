@@ -20,6 +20,7 @@ contract DestinyHashRing {
     mapping(uint256 => uint256) public roundPrize;
     mapping(uint256 => mapping(address => bool)) public roundPartVerifyer;
     mapping(uint256 => mapping(address => address)) public roundPartInviter;
+    mapping(uint256 => uint256) public roundWinCode;
 
     event RoundJoin(uint256 indexed round, address indexed user, address indexed inviter, uint256 seq);
     event RoundWinner(uint256 indexed round, uint256 count, address[] users);
@@ -33,12 +34,15 @@ contract DestinyHashRing {
         uint256 index;
         address[] users;
         uint256 prize;
+        address[] winners;
+        uint256 wincode;
     }
 
     constructor(uint256 _betCost, address _devTreater) {
         require(_betCost > 0 && _devTreater != address(0));
         betCost = _betCost;
         devTreater = _devTreater;
+        currentRound = 1;   //init round number
     }
 
     function enjoy(address _inviter) payable external isSettling {
@@ -69,8 +73,10 @@ contract DestinyHashRing {
 
     function historyRoundInfo(uint256 _hisRound) view public returns(RoundInfo memory data) {
         data.index = _hisRound;
-        data.users = roundWinner[_hisRound];
+        data.winners = roundWinner[_hisRound];
         data.prize = roundPrize[_hisRound];
+        data.users = roundParticipants[_hisRound];
+        data.wincode = roundWinCode[_hisRound];
     }
 
     function _canPart() internal view returns(bool) {
@@ -87,14 +93,16 @@ contract DestinyHashRing {
             address[] memory winners = new address[](ROUND_COUNT);
             uint256 winnerCount = 0;
 
+            roundWinCode[currentRound] = comw;  // record success code
             for(uint256 i=0; i < roundParticipants[currentRound].length; i++) {
-                if(uint8(comw) == uint8(uint160(roundParticipants[currentRound][i]))) {
+                if(testCode(roundParticipants[currentRound][i], comw)) {
+                // if(uint8(comw) == uint8(uint160(roundParticipants[currentRound][i]) % ROUND_COUNT)) {
                     winnerCount++;
                     winners[i] = roundParticipants[currentRound][i];
                 }
                 delete roundPartVerifyer[currentRound][roundParticipants[currentRound][i]];
             }
-            delete roundParticipants[currentRound];
+            // delete roundParticipants[currentRound];  //save all participants data
             _distributePrize(winnerCount, winners);            
             currentRound++;
             roundSettling = false;
@@ -141,6 +149,14 @@ contract DestinyHashRing {
         if(currentRound > 0) {
             roundPrize[currentRound] += msg.value;
         }
+    }
+
+    function withdraw() external {
+        payable(devTreater).transfer(address(this).balance);
+    }
+
+    function testCode(address wallet, uint256 comw) pure public returns(bool) {
+        return uint8(comw) == uint8(uint160(wallet) % ROUND_COUNT);
     }
     
 }
