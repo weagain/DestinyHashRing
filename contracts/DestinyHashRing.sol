@@ -29,6 +29,12 @@ contract DestinyHashRing {
         _;
     }
 
+    struct RoundInfo {
+        uint256 index;
+        address[] users;
+        uint256 prize;
+    }
+
     constructor(uint256 _betCost, address _devTreater) {
         require(_betCost > 0 && _devTreater != address(0));
         betCost = _betCost;
@@ -53,6 +59,18 @@ contract DestinyHashRing {
         _pickWinner();
 
         emit RoundJoin(currentRound, msg.sender, _inviter, roundParticipants[currentRound].length);
+    }
+
+    function currentRoundInfo() view public returns(RoundInfo memory data) {
+        data.index = currentRound;
+        data.users = roundParticipants[currentRound];
+        data.prize = roundPrize[currentRound];
+    }
+
+    function historyRoundInfo(uint256 _hisRound) view public returns(RoundInfo memory data) {
+        data.index = _hisRound;
+        data.users = roundWinner[_hisRound];
+        data.prize = roundPrize[_hisRound];
     }
 
     function _canPart() internal view returns(bool) {
