@@ -45,7 +45,7 @@ contract DestinyHashRing {
         if(_inviter != address(0)) {
             uint256 size;
             assembly { size := extcodesize(_inviter) }
-            if(size > 0) {
+            if(size == 0) {
                 roundPartInviter[currentRound][msg.sender] = _inviter;    // ensure it's a EOA
             }
         }
@@ -79,6 +79,7 @@ contract DestinyHashRing {
             delete roundParticipants[currentRound];
             _distributePrize(winnerCount, winners);            
             currentRound++;
+            roundSettling = false;
         }
     }
 
@@ -101,14 +102,27 @@ contract DestinyHashRing {
                         _sharePrize = eachPrize / INVITE_SHARE;
                         payable(roundPartInviter[currentRound][_winners[i]]).transfer(_sharePrize);
                     }
-                    payable(_winners[i]).transfer(eachPrize - _sharePrize);
+                    // payable(_winners[i]).transfer(eachPrize - _sharePrize);
+                    bool transVal = _secTransfer(_winners[i], eachPrize - _sharePrize);
+                    if(!transVal) {
+                        roundPrize[currentRound + 1] += (eachPrize - _sharePrize);  //to cumulate prize to next round when bad contract 
+                    }
                 }
             }
             emit RoundWinner(currentRound, _count, _winners);
         }
     }
 
+    function _secTransfer(address target, uint256 amount) private returns(bool) {
+        (bool result,) = payable(target).call{value: amount, gas: 50_000}("");
+        return result;
+    }
 
-    receive() payable external {}
+
+    receive() payable external {
+        if(currentRound > 0) {
+            roundPrize[currentRound] += msg.value;
+        }
+    }
     
 }
