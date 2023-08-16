@@ -14,5 +14,8 @@
     "url": "git@github.chinaren:weagain/DestinyHashRing.git"
   },
   "author": "wecrypto",
-  "license": "MIT"
+  "license": "MIT",
+  "dependencies": {
+    "@openzeppelin/contracts": "^4.9.3"
+  }
 }

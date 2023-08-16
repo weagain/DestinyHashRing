@@ -1,116 +1,169 @@
-/**
- * Use this file to configure your truffle project. It's seeded with some
- * common settings for different networks and features like migrations,
- * compilation and testing. Uncomment the ones you need or modify
- * them to suit your project as necessary.
- *
- * More information about configuration can be found at:
- *
- * trufflesuite.com/docs/advanced/configuration
- *
- * To deploy via Infura you'll need a wallet provider (like @truffle/hdwallet-provider)
- * to sign your transactions before they're sent to a remote public node. Infura accounts
- * are available for free at: infura.io/register.
- *
- * You'll also need a mnemonic - the twelve word phrase the wallet uses to generate
- * public/private key pairs. If you're publishing your code to GitHub make sure you load this
- * phrase from a file you've .gitignored so it doesn't accidentally become public.
- *
- */
+const HDWalletProvider = require('@truffle/hdwallet-provider')
+const dotenv = require("dotenv")
 
-// const HDWalletProvider = require('@truffle/hdwallet-provider');
-//
-// const fs = require('fs');
-// const mnemonic = fs.readFileSync(".secret").toString().trim();
+dotenv.config()
+const infuraKey = process.env.INFURA_KEY || ''
+const infuraSecret = process.env.INFURA_SECRET || ''
+const liveNetworkPK = process.env.LIVE_PK || ''
+const privateKey = [ liveNetworkPK ]
+const privateAddress = process.env.LIVE_ADDRESS
+const etherscanApiKey = process.env.ETHERS_SCAN_API_KEY || ''
+const polygonApiKey = process.env.POLYGON_SCAN_API_KEY || ''
+const bscApiKey = process.env.BSC_SCAN_API_KEY || ''
+
 
 module.exports = {
-  /**
-   * Networks define how you connect to your ethereum client and let you set the
-   * defaults web3 uses to send transactions. If you don't specify one truffle
-   * will spin up a development blockchain for you on port 9545 when you
-   * run `develop` or `test`. You can ask a truffle command to use a specific
-   * network from the command line, e.g
-   *
-   * $ truffle test --network <network-name>
-   */
-
   networks: {
-    // Useful for testing. The `development` name is special - truffle uses it by default
-    // if it's defined here and no other network is specified at the command line.
-    // You should run a client (like ganache-cli, geth or parity) in a separate terminal
-    // tab if you use this network and you must also set the `host`, `port` and `network_id`
-    // options below to some value.
-    //
-    // development: {
-    //  host: "127.0.0.1",     // Localhost (default: none)
-    //  port: 8545,            // Standard Ethereum port (default: none)
-    //  network_id: "*",       // Any network (default: none)
-    // },
-    // Another network with more advanced options...
-    // advanced: {
-    // port: 8777,             // Custom port
-    // network_id: 1342,       // Custom network
-    // gas: 8500000,           // Gas sent with each transaction (default: ~6700000)
-    // gasPrice: 20000000000,  // 20 gwei (in wei) (default: 100 gwei)
-    // from: <address>,        // Account to send txs from (default: accounts[0])
-    // websocket: true        // Enable EventEmitter interface for web3 (default: false)
-    // },
-    // Useful for deploying to a public network.
-    // NB: It's important to wrap the provider as a function.
-    // ropsten: {
-    // provider: () => new HDWalletProvider(mnemonic, `https://ropsten.infura.io/v3/YOUR-PROJECT-ID`),
-    // network_id: 3,       // Ropsten's id
-    // gas: 5500000,        // Ropsten has a lower block limit than mainnet
-    // confirmations: 2,    // # of confs to wait between deployments. (default: 0)
-    // timeoutBlocks: 200,  // # of blocks before a deployment times out  (minimum/default: 50)
-    // skipDryRun: true     // Skip dry run before migrations? (default: false for public nets )
-    // },
-    // Useful for private networks
-    // private: {
-    // provider: () => new HDWalletProvider(mnemonic, `https://network.io`),
-    // network_id: 2111,   // This network is yours, in the cloud.
-    // production: true    // Treats this network as if it was a public net. (default: false)
-    // }
+    ganache: {
+      host: "127.0.0.1",
+      port: 7545,
+      network_id: "5777",
+      websocket: true
+    },
+    rinkeby: {
+      provider: () => new HDWalletProvider({
+        privateKeys: privKeysRinkeby,
+        //providerOrUrl: `https://:${infuraSecret}@rinkeby.infura.io/v3/${infuraKey}`,
+        providerOrUrl: `wss://:${infuraSecret}@rinkeby.infura.io/ws/v3/${infuraKey}`,
+        pollingInterval: 56000
+      }),
+      network_id: 4,
+      confirmations: 2,
+      timeoutBlocks: 100,
+      skipDryRun: true,
+      from: privateAddress,
+      networkCheckTimeout: 999999
+    },
+    goerli: {
+      provider: () => new HDWalletProvider({
+        privateKeys: privateKey,
+        //providerOrUrl: `https://:${infuraSecret}@goerli.infura.io/v3/${infuraKey}`,
+        providerOrUrl: `wss://:${infuraSecret}@goerli.infura.io/ws/v3/${infuraKey}`,
+        pollingInterval: 56000
+      }),
+      network_id: 5,
+      confirmations: 2,
+      timeoutBlocks: 100,
+      skipDryRun: true,
+      from: privateAddress,
+      networkCheckTimeout: 999999
+    },
+    bsc_testnet: {
+      provider: () => new HDWalletProvider({
+        privateKeys: privateKey,
+        providerOrUrl: `https://data-seed-prebsc-1-s1.binance.org:8545`,
+        pollingInterval: 56000
+      }),
+      network_id: 97,
+      confirmations: 2,
+      timeoutBlocks: 100,
+      from: privateAddress,
+      skipDryRun: true,
+      networkCheckTimeout: 999999
+    },
+    pulsechain_testnet: {
+      provider: () => new HDWalletProvider({
+        privateKeys: privateKey,
+        providerOrUrl: `https://rpc.v2b.testnet.pulsechain.com`,
+        pollingInterval: 56000
+      }),
+      network_id: 941,
+      confirmations: 2,
+      timeoutBlocks: 100,
+      skipDryRun: true,
+      from: privateAddress,
+      networkCheckTimeout: 999999
+    },
+    ethw_testnet: {
+      provider: () => new HDWalletProvider({
+        privateKeys: privateKey,
+        providerOrUrl: `https://iceberg.ethereumpow.org/`,
+        pollingInterval: 56000
+      }),
+      network_id: 10002,
+      confirmations: 2,
+      timeoutBlocks: 100,
+      skipDryRun: true,
+      from: privateAddress,
+      networkCheckTimeout: 999999
+    },
+    mumbai: {
+      provider: () => new HDWalletProvider({
+        privateKeys: privateKey,
+        providerOrUrl: `https://rpc-mumbai.maticvigil.com/v1/53a113316e0a9e20bcf02b13dd504ac33aeea3ba`,
+        pollingInterval: 56000
+      }),
+      network_id: 80001,
+      confirmations: 2,
+      timeoutBlocks: 200,
+      pollingInterval: 1000,
+      skipDryRun: true,
+      from: privateAddress,
+      networkCheckTimeout: 999999
+      //websockets: true
+    },
+    ethf_mainnet: {
+      provider: () => new HDWalletProvider({
+        privateKeys: privateKey,
+        providerOrUrl: `https://rpc.etherfair.link`,
+        pollingInterval: 56000
+      }),
+      network_id: 513100,
+      confirmations: 2,
+      timeoutBlocks: 100,
+      skipDryRun: true,
+      from: privateAddress,
+      networkCheckTimeout: 99999999
+    },
+    eth_mainnet: {
+      provider: () => new HDWalletProvider({
+        privateKeys: privateKey,
+        providerOrUrl: `https://mainnet.infura.io/v3/db7ad163cfed48c181c8456f2ab3fe54`,
+        pollingInterval: 56000
+      }),
+      network_id: 1,
+      confirmations: 2,
+      timeoutBlocks: 100,
+      skipDryRun: true,
+      from: privateAddress,
+      networkCheckTimeout: 999999
+    },
+    bsc_mainnet: {
+      provider: () => new HDWalletProvider({
+        privateKeys: privateKey,
+        providerOrUrl: `https://bsc-dataseed1.ninicoin.io`,
+        pollingInterval: 56000
+      }),
+      network_id: 56,
+      confirmations: 2,
+      timeoutBlocks: 100,
+      skipDryRun: true,
+      from: privateAddress,
+      networkCheckTimeout: 999999
+    },
   },
-
-  // Set default mocha options here, use special reporters etc.
   mocha: {
-    // timeout: 100000
+    timeout: 100_000
   },
-
-  // Configure your compilers
   compilers: {
     solc: {
-      version: "0.8.11",    // Fetch exact version from solc-bin (default: truffle's version)
-      // docker: true,        // Use "0.5.1" you've installed locally with docker (default: false)
-      // settings: {          // See the solidity docs for advice about optimization and evmVersion
-      //  optimizer: {
-      //    enabled: false,
-      //    runs: 200
-      //  },
-      //  evmVersion: "byzantium"
-      // }
+      version: "0.8.17",
+      settings: {
+        optimizer: {
+          enabled: true,
+          runs: 200
+        },
+        evmVersion: "london"
+      }
     }
   },
-
-  // Truffle DB is currently disabled by default; to enable it, change enabled:
-  // false to enabled: true. The default storage location can also be
-  // overridden by specifying the adapter settings, as shown in the commented code below.
-  //
-  // NOTE: It is not possible to migrate your contracts to truffle DB and you should
-  // make a backup of your artifacts to a safe location before enabling this feature.
-  //
-  // After you backed up your artifacts you can utilize db by running migrate as follows: 
-  // $ truffle migrate --reset --compile-all
-  //
-  // db: {
-    // enabled: false,
-    // host: "127.0.0.1",
-    // adapter: {
-    //   name: "sqlite",
-    //   settings: {
-    //     directory: ".db"
-    //   }
-    // }
-  // }
+  db: {
+    enabled: false
+  },
+  plugins: ['truffle-plugin-verify'],
+  api_keys: {
+    etherscan: etherscanApiKey,
+    bscscan: bscApiKey,
+    polygonscan: polygonApiKey
+  }
 };
