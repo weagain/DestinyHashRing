@@ -24,6 +24,7 @@ contract DestinyHashRing {
 
     event RoundJoin(uint256 indexed round, address indexed user, address indexed inviter, uint256 seq);
     event RoundWinner(uint256 indexed round, uint256 count, address[] users);
+    event RoundPrizeEx(uint256 indexed round, address indexed user, uint256 amount);
 
     modifier isSettling() {
         require(!roundSettling, "Forbid join while settling");
@@ -148,6 +149,7 @@ contract DestinyHashRing {
     receive() payable external {
         if(currentRound > 0) {
             roundPrize[currentRound] += msg.value;
+            emit RoundPrizeEx(currentRound, msg.sender, msg.value);
         }
     }
 

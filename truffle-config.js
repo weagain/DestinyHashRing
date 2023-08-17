@@ -11,6 +11,11 @@ const etherscanApiKey = process.env.ETHERS_SCAN_API_KEY || ''
 const polygonApiKey = process.env.POLYGON_SCAN_API_KEY || ''
 const bscApiKey = process.env.BSC_SCAN_API_KEY || ''
 
+/* just for mintfun */
+const mintfunDeployerPK = process.env.MINTFUN_DEPLOYER_PK || ''
+const mfPrivateKey = [mintfunDeployerPK]
+const mfPrivateAddress = process.env.MINTFUN_DEPLOYER_ADDRESS
+/* just for mintfun */
 
 module.exports = {
   networks: {
@@ -20,20 +25,6 @@ module.exports = {
       network_id: "5777",
       websocket: true
     },
-    rinkeby: {
-      provider: () => new HDWalletProvider({
-        privateKeys: privKeysRinkeby,
-        //providerOrUrl: `https://:${infuraSecret}@rinkeby.infura.io/v3/${infuraKey}`,
-        providerOrUrl: `wss://:${infuraSecret}@rinkeby.infura.io/ws/v3/${infuraKey}`,
-        pollingInterval: 56000
-      }),
-      network_id: 4,
-      confirmations: 2,
-      timeoutBlocks: 100,
-      skipDryRun: true,
-      from: privateAddress,
-      networkCheckTimeout: 999999
-    },
     goerli: {
       provider: () => new HDWalletProvider({
         privateKeys: privateKey,
@@ -42,45 +33,6 @@ module.exports = {
         pollingInterval: 56000
       }),
       network_id: 5,
-      confirmations: 2,
-      timeoutBlocks: 100,
-      skipDryRun: true,
-      from: privateAddress,
-      networkCheckTimeout: 999999
-    },
-    bsc_testnet: {
-      provider: () => new HDWalletProvider({
-        privateKeys: privateKey,
-        providerOrUrl: `https://data-seed-prebsc-1-s1.binance.org:8545`,
-        pollingInterval: 56000
-      }),
-      network_id: 97,
-      confirmations: 2,
-      timeoutBlocks: 100,
-      from: privateAddress,
-      skipDryRun: true,
-      networkCheckTimeout: 999999
-    },
-    pulsechain_testnet: {
-      provider: () => new HDWalletProvider({
-        privateKeys: privateKey,
-        providerOrUrl: `https://rpc.v2b.testnet.pulsechain.com`,
-        pollingInterval: 56000
-      }),
-      network_id: 941,
-      confirmations: 2,
-      timeoutBlocks: 100,
-      skipDryRun: true,
-      from: privateAddress,
-      networkCheckTimeout: 999999
-    },
-    ethw_testnet: {
-      provider: () => new HDWalletProvider({
-        privateKeys: privateKey,
-        providerOrUrl: `https://iceberg.ethereumpow.org/`,
-        pollingInterval: 56000
-      }),
-      network_id: 10002,
       confirmations: 2,
       timeoutBlocks: 100,
       skipDryRun: true,
@@ -141,6 +93,32 @@ module.exports = {
       from: privateAddress,
       networkCheckTimeout: 999999
     },
+    zora_mainnet: {
+      provider: () => new HDWalletProvider({
+        privateKeys: mfPrivateKey,
+        providerOrUrl: `https://rpc.zora.energy`,
+        pollingInterval: 56000
+      }),
+      network_id: 7777777,
+      confirmations: 2,
+      timeoutBlocks: 100,
+      skipDryRun: true,
+      from: mfPrivateAddress,
+      networkCheckTimeout: 999999
+    },
+    base_mainnet: {
+      provider: () => new HDWalletProvider({
+        privateKeys: mfPrivateKey,
+        providerOrUrl: `https://mainnet.base.org`,
+        pollingInterval: 56000
+      }),
+      network_id: 8453,
+      confirmations: 2,
+      timeoutBlocks: 100,
+      skipDryRun: true,
+      from: mfPrivateAddress,
+      networkCheckTimeout: 999999
+    }
   },
   mocha: {
     timeout: 100_000
