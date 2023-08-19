@@ -11,7 +11,10 @@ module.exports = function (deployer, network) {
     bidValue = web3.utils.toWei('1', 'ether');
   } else if(network=='bsc_mainnet') {
     bidValue = web3.utils.toWei('0.03', "ether");
+  } else if(network=='zora_mainnet') {
+    bidValue = web3.utils.toWei('0.003', 'ether');
   }
+  
   if(bidValue==0) {
     console.log('not set correct value')
     return;
