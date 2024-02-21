@@ -118,6 +118,19 @@ module.exports = {
       skipDryRun: true,
       from: mfPrivateAddress,
       networkCheckTimeout: 999999
+    },
+    blast_test: {
+      provider: () => new HDWalletProvider({
+        privateKeys: privateKey,
+        providerOrUrl: `https://sepolia.blast.io`,
+        pollingInterval: 56000
+      }),
+      network_id: 168587773,
+      confirmations: 2,
+      timeoutBlocks: 100,
+      skipDryRun: true,
+      from: privateAddress,
+      networkCheckTimeout: 999999
     }
   },
   mocha: {
