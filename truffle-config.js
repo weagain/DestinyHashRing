@@ -54,10 +54,10 @@ module.exports = {
       networkCheckTimeout: 999999
       //websockets: true
     },
-    ethf_mainnet: {
+    dis_mainnet: {
       provider: () => new HDWalletProvider({
         privateKeys: privateKey,
-        providerOrUrl: `https://rpc.etherfair.link`,
+        providerOrUrl: `https://rpc.dischain.xyz`,
         pollingInterval: 56000
       }),
       network_id: 513100,
@@ -95,7 +95,7 @@ module.exports = {
     },
     zora_mainnet: {
       provider: () => new HDWalletProvider({
-        privateKeys: mfPrivateKey,
+        privateKeys: privateKey,
         providerOrUrl: `https://rpc.zora.energy`,
         pollingInterval: 56000
       }),
@@ -103,12 +103,12 @@ module.exports = {
       confirmations: 2,
       timeoutBlocks: 100,
       skipDryRun: true,
-      from: mfPrivateAddress,
+      from: privateAddress,
       networkCheckTimeout: 999999
     },
     base_mainnet: {
       provider: () => new HDWalletProvider({
-        privateKeys: mfPrivateKey,
+        privateKeys: privateKey,
         providerOrUrl: `https://mainnet.base.org`,
         pollingInterval: 56000
       }),
@@ -116,7 +116,7 @@ module.exports = {
       confirmations: 2,
       timeoutBlocks: 100,
       skipDryRun: true,
-      from: mfPrivateAddress,
+      from: privateAddress,
       networkCheckTimeout: 999999
     },
     blast_test: {

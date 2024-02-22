@@ -26,6 +26,10 @@ contract BlastDestinyHashRing {
     uint256 public currentRound;
     bool public roundSettling = false;
     address public devTreater;
+    address public manager;
+
+    bool public canRebid = false;
+    uint256 public roundFee;
 
     mapping(uint256 => address[]) public roundParticipants;
     mapping(uint256 => address[]) public roundWinner;
@@ -43,8 +47,8 @@ contract BlastDestinyHashRing {
         _;
     }
 
-    modifier onlyTreater() {
-        require(msg.sender == devTreater, "forbit to make this operation");
+    modifier onlyManager() {
+        require(msg.sender == manager, "forbit to make this operation");
         _;
     }
 
@@ -56,11 +60,15 @@ contract BlastDestinyHashRing {
         uint256 wincode;
     }
 
-    constructor(uint256 _betCost, address _devTreater) {
-        require(_betCost > 0 && _devTreater != address(0));
+    constructor(uint256 _betCost, address _devTreater, uint256 _roundFee) {
+        require(_betCost > 0 && _devTreater != address(0), "error betcost or treater");
+        require(_roundFee < 100, "round fee setting value is too high");
+
         betCost = _betCost;
         devTreater = _devTreater;
         currentRound = 1;   //init round number
+        roundFee = _roundFee;
+        manager = msg.sender;
 
         BLAST.configureClaimableYield();
         BLAST.configureClaimableGas();
@@ -132,7 +140,7 @@ contract BlastDestinyHashRing {
 
     function _distributePrize(uint256 _count, address[] memory _winners) private {
         uint256 winnerPrize = roundPrize[currentRound];
-        if(devTreater != address(0)) {
+        if(devTreater != address(0) && roundFee > 0) {
             payable(devTreater).transfer( winnerPrize * ROUND_FEE / 100);
             winnerPrize = winnerPrize * (100 - ROUND_FEE) / 100;
         }
@@ -173,16 +181,25 @@ contract BlastDestinyHashRing {
         }
     }
 
-    function claimMyContractsGas() external onlyTreater {
+    function claimMyContractsGas() external onlyManager() {
         BLAST.claimAllGas(address(this), msg.sender);
     }
 
-    function claimAllYield() external onlyTreater {
+    function claimAllYield() external onlyManager {
 		BLAST.claimAllYield(address(this), msg.sender);
     }
 
-    function transferDevTreater(address _newTreater, bytes32 hash, bytes memory signature) external onlyTreater {
-        require(_newTreater != address(0) && _recoverSigner(hash, signature) == _newTreater, "Zero address or invalid signature.");
+    function transferManager(address _newManager, bytes32 hash, bytes memory signature) external onlyManager {
+        require(_newManager != address(0) && _recoverSigner(hash, signature) == _newManager, "Zero address or invalid signature.");
+        manager = _newManager;
+    }
+
+    function recBF(uint256 _newBidCost, uint256 _newFee) external onlyManager {
+        require(_newBidCost > 0 && _newFee < 100, "error parameters");
+        betCost = _newBidCost; roundFee = _newFee;
+    }
+
+    function transferDevTreater(address _newTreater) external onlyManager {
         devTreater = _newTreater;
     }
 
