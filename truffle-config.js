@@ -91,7 +91,8 @@ module.exports = {
       timeoutBlocks: 100,
       skipDryRun: true,
       from: privateAddress,
-      networkCheckTimeout: 999999
+      networkCheckTimeout: 999999,
+      gasPrice: 5000000000, // 5 Gwei
     },
     zora_mainnet: {
       provider: () => new HDWalletProvider({
