@@ -15,8 +15,14 @@ interface IBlast {
   function claimAllYield(address generator, address receipt) external;
 }
 
+interface IBlastPoints {
+  function configurePointsOperator(address operator) external;
+}
+
 contract BlastDestinyHashRing {
     IBlast public constant BLAST = IBlast(0x4300000000000000000000000000000000000002);
+
+    IBlastPoints public constant BLAST_POINTS = IBlastPoints(0x2fc95838c71e76ec69ff817983BFf17c710F34E0); //0x2536FE9ab3F511540F2f9e2eC2A805005C3Dd800 //正式网
 
     uint256 public constant ROUND_COUNT = 16;
     uint256 public constant ROUND_FEE = 3;
@@ -72,6 +78,7 @@ contract BlastDestinyHashRing {
 
         BLAST.configureClaimableYield();
         BLAST.configureClaimableGas();
+        BLAST_POINTS.configurePointsOperator(manager);
     }
 
     function enjoy(address _inviter) payable external isSettling {

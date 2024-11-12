@@ -13,5 +13,5 @@ module.exports = function (deployer, network) {
   }
 
   console.log('network===', network, bidValue)
-  deployer.deploy(DestinyHashRing, bidValue, '0x0000007915D5D3FF91aaFa880d1D9c352165B364');
+  deployer.deploy(DestinyHashRing, bidValue, '0x0000007915D5D3FF91aaFa880d1D9c352165B364', 3);
 };
